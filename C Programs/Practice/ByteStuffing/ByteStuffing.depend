@@ -1,0 +1,5 @@
+# depslib dependency file v1.0
+1558862814 source:c:\users\deekshith\desktop\study\6th sem\ccn lab\practice\bytestuffing\main.c
+	<stdio.h>
+	<string.h>
+

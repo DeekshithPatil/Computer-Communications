@@ -1,0 +1,58 @@
+set ns [new Simulator]
+set nf [open lin.nam w]
+$ns namtrace-all $nf
+set tf [open lin.tr w]
+$ns trace-all $tf
+set a [$ns node]
+set b [$ns node]
+set c [$ns node]
+set d [$ns node]
+set e [$ns node]
+$d color red
+$d shape square
+$e color green
+$e shape hexagon
+$ns rtproto LS
+$ns duplex-link $a $b 10Mb 10ms DropTail
+$ns cost $a $b 5
+$ns duplex-link $a $d 10Mb 10ms DropTail
+$ns cost $a $d 5
+$ns duplex-link $a $c 10Mb 10ms DropTail
+$ns cost $a $c 2
+$ns duplex-link $b $c 10Mb 10ms DropTail
+$ns cost $b $c 4
+$ns duplex-link $b $e 10Mb 10ms DropTail
+$ns cost $b $e 3
+$ns duplex-link $c $e 10Mb 10ms DropTail
+$ns cost $c $e 4
+
+set udp1 [new Agent/UDP]
+set null1 [new Agent/Null]
+$ns attach-agent $d $udp1
+$ns attach-agent $e $null1
+$ns connect $udp1 $null1
+set cbr1 [new Application/Traffic/CBR]
+$cbr1 attach-agent $udp1
+
+$ns at 1.0 "$cbr1 start"
+$ns rtmodel-at 1.5 down $a $c
+$ns rtmodel-at 2.0 down $b $e
+$ns rtmodel-at 2.5 up $a $c
+$ns rtmodel-at 2.5 up $b $e
+$ns rtmodel-at 2.5 down $d $a
+$ns rtmodel-at 3.0 up $d $a
+$ns rtmodel-at 3.0 down $a $b
+$ns rtmodel-at 3.0 down $c $e
+$ns rtmodel-at 4.0 up $c $e
+$ns rtmodel-at 4.0 up $a $b
+$ns at 5.0 "$cbr1 stop"
+proc finish {} {
+global ns tf nf
+$ns flush-trace
+close $nf
+close $tf
+exec nam lin.nam &
+exit 0
+}
+$ns at 6.0 finish
+$ns run

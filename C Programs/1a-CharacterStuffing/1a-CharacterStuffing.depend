@@ -1,0 +1,6 @@
+# depslib dependency file v1.0
+1558861473 source:c:\users\deekshith\desktop\study\6th sem\ccn lab\1a-characterstuffing\main.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+

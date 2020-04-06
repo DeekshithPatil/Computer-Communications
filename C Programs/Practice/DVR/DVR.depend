@@ -1,0 +1,5 @@
+# depslib dependency file v1.0
+1558878251 source:c:\users\deekshith\desktop\study\6th sem\ccn lab\practice\dvr\main.c
+	<stdio.h>
+	<stdlib.h>
+

@@ -1,0 +1,6 @@
+# depslib dependency file v1.0
+1558864366 source:c:\users\deekshith\desktop\study\6th sem\ccn lab\practice\crc\main.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+

@@ -1,0 +1,89 @@
+set ns [new Simulator]
+set tf [open trc.tr w]
+$ns trace-all $tf
+set nf [open trc.nam w]
+$ns namtrace-all $nf
+
+set n0 [$ns node]
+set n1 [$ns node]
+set n2 [$ns node]
+set n3 [$ns node]
+#label the nodes
+$n0 label "TCP source" 
+$n1 label "UDP source"
+$n2 label "Router"
+$n3 label "Sink"
+#change color of data packets
+$ns color 1 Red 
+#note R is caps and color and not colour
+$ns color 2 Blue
+
+$ns duplex-link $n0 $n2 2.7Mb 10ms DropTail 
+#D and T are caps in droptail
+$ns duplex-link $n1 $n2 2.7Mb 10ms DropTail 
+$ns duplex-link $n2 $n3 50Kb 10ms DropTail 
+$ns queue-limit $n2 $n3 40 
+#from node 2 to 3, the que size is 40
+
+#To orient the nodes properly in nam file
+$ns duplex-link-op $n0 $n2 orient right-down 
+#op stands for object property
+$ns duplex-link-op $n1 $n2 orient right-up
+$ns duplex-link-op $n2 $n3 orient right
+
+#attach agent
+set udp [new Agent/UDP]
+$ns attach-agent $n1 $udp
+#n1 is transmitter
+set cbr [new Application/Traffic/CBR] 
+#here object cbr has Traffic protcol in Application layer
+$cbr attach-agent $udp 
+#cbr is being attached to the already existing object i.e UDP
+
+$cbr set packetSize_ 500 
+#note S is caps
+$cbr set interval_ 0.003
+set null [new Agent/Null] 
+#note only N is caps
+$ns attach-agent $n3 $null 
+$ns connect $udp $null 
+
+set tcp [new Agent/TCP]
+$ns attach-agent $n0 $tcp 
+#n0 is the transmitter with tcp protocol
+set ftp [new Application/FTP]
+$ftp attach-agent $tcp
+set sink [new Agent/TCPSink] 
+#This is similar to null in udp
+$ns attach-agent $n3 $sink
+$ftp set maxPkts_ 1000 
+#max packets that it sends
+$ftp set packetSize_ 200
+$ns connect $tcp $sink
+$udp set class_ 1
+$tcp set class_ 2
+$ns at 0.1 "$cbr start"
+$ns at 1.0 "$ftp start"
+$ns at 4.0 "$ftp stop"
+$ns at 4.5 "$cbr stop"
+
+proc finish {} {
+global tf nf ns
+$ns flush-trace
+close $tf
+close $nf 
+exec nam trc.nam &
+exec awk -f tcp.awk trc.tr &
+exit 0
+}
+$ns at 5.0 "finish"
+$ns run
+
+
+
+
+
+
+
+
+ 
